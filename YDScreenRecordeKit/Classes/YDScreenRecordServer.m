@@ -18,52 +18,69 @@
 @property (nonatomic, assign) NSInteger                        startTime;
 @property (nonatomic, copy)void (^complate)(BOOL, NSString * _Nonnull path);
 
+@property (nonatomic, copy)YDRecordStartSuccess startBlock;
+@property (nonatomic, copy)YDRecordStopSuccess stopBlock;
+@property (nonatomic, copy)YDRecordFailure startFailure;
+@property (nonatomic, copy)YDRecordFailure stopFailure;
+
 @property (nonatomic, strong) YDVideoWriteServer              *writeServer;
 
 @end
 
+#define kWeakSelf(type)  __weak typeof(type) weak##type = type;
+#define kStrongSelf(type) __strong typeof(type) strong##type = weak##type;
+
 @implementation YDScreenRecordServer
 
-- (void)startScreenRecord {
-    if (@available(iOS 11.0, *)) {
-        self.complate = nil;
-        [self startRecord];
-        [self addNotification];
-    }
-    else
-    {
-//        ArtLogInfo(@"视频录制～～～～～失败系统版本低");
-    }
+- (void)startScreenRecord:(YDRecordStartSuccess)onSuccess failure:(YDRecordFailure)failure {
+    self.startBlock = onSuccess;
+    self.startFailure = failure;
+    self.complate = nil;
+    [self _startRecording];
+    [self addNotification];
 }
 
-- (void)startRecord {
+- (void)stopRecordComplete:(YDRecordStopSuccess) onSuccess failure:(YDRecordFailure) failure {
+    self.stopBlock = onSuccess;
+    self.stopFailure = failure;
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_stopRecording) object:nil];
+    self.isRecording = NO;
+    self.needContinue = NO;
+    [self _stopRecording];
+}
+
+- (void)_startRecording {
     if (@available(iOS 11.0, *)) {
-//        ArtLogInfo(@"视频录制～～～～开始启动");
         self.isRecording = YES;
         self.needContinue = YES;
         self.startTime = [[NSDate date] timeIntervalSince1970];
         [RPScreenRecorder sharedRecorder].microphoneEnabled = NO;
         [self.writeServer resetAndConstructWrite];
+        kWeakSelf(self)
         [[RPScreenRecorder sharedRecorder] startCaptureWithHandler:^(CMSampleBufferRef  _Nonnull sampleBuffer, RPSampleBufferType bufferType, NSError * _Nullable error) {
+            kStrongSelf(self)
             if (error) {
-//                ArtLogInfo(@"视频录制～～～～错误:%@",error);
+                YDSRErrorHandle *err = [[YDSRErrorHandle alloc] initWithError:error];
+                if (strongself.startFailure) {
+                    strongself.startFailure(err);
+                }
                 return;
             }
-            if (!self.isRecording) return;
+            if (!strongself.isRecording) return;
             switch (bufferType) {
                 case RPSampleBufferTypeVideo:
                 {
-                    [self.writeServer appendVSampleBuffer:sampleBuffer];
+                    [strongself.writeServer appendVSampleBuffer:sampleBuffer];
                 }
                     break;
                 case RPSampleBufferTypeAudioApp:
                 {
-                    [self.writeServer appendAudioSampleBuffer:sampleBuffer];
+                    [strongself.writeServer appendAudioSampleBuffer:sampleBuffer];
                 }
                     break;
                 case RPSampleBufferTypeAudioMic:
                 {
-                    [self.writeServer appendMicSampleBuffer:sampleBuffer];
+                    [strongself.writeServer appendMicSampleBuffer:sampleBuffer];
                 }
                     break;
                 default:
@@ -71,21 +88,48 @@
             }
         } completionHandler:^(NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
+                kStrongSelf(self)
                 if (error) {
-//                    ArtLogInfo(@"视频录制～～～～开始启动失败:%@",error);
+                    YDSRErrorHandle *err = [[YDSRErrorHandle alloc] initWithError:error];
+                    if (strongself.startFailure) {
+                        strongself.startFailure(err);
+                    }
                 }
                 else {
-//                    ArtLogInfo(@"视频录制～～～～开始启动成功");
-//                    [self performSelector:@selector(stopRPScreen) withObject:nil afterDelay:10*60];
-                    if (self.starSuc) {
-                        self.starSuc();
+                    if (strongself.startBlock) {
+                        strongself.startBlock();
                     }
                 }
             });
         }];
     } else {
-//        ArtLogInfo(@"视频录制～～～～～失败系统版本低");
-        // Fallback on earlier versions
+        YDSRErrorHandle *err = [[YDSRErrorHandle alloc] init];
+        err.isError = YES;
+        err.msg = @"需要iOS11以上系统";
+        err.code = 10001;
+        if (self.startFailure) {
+            self.startFailure(err);
+        }
+    }
+}
+
+- (void)_stopRecording {
+    if (@available(iOS 11.0, *)) {
+        self.isRecording = NO;
+        if ([RPScreenRecorder sharedRecorder].recording) {
+            [[RPScreenRecorder sharedRecorder] stopCaptureWithHandler:^(NSError * _Nullable error) {
+              
+            }];
+        }
+        [self.writeServer stopWrite];
+    } else {
+        YDSRErrorHandle *err = [[YDSRErrorHandle alloc] init];
+        err.isError = YES;
+        err.msg = @"需要iOS11以上系统";
+        err.code = 10001;
+        if (self.stopFailure) {
+            self.stopFailure(err);
+        }
     }
 }
 
@@ -96,61 +140,34 @@
 
 - (void)willEnterBackground {
     if (self.isRecording && self.writeServer.isWrite) {
-//        ArtLogInfo(@"视频录制～～～～进入后台");
         self.needContinue = NO;
         self.isRecording = NO;
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRPScreen) object:nil];
+        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(_stopRecording) object:nil];
         self.inBack = YES;
-        [self stopRPScreen];
-//        [[ArtRecordManger manager] beginBackgroundTask];
+        [self _stopRecording];
     }
 }
 
 - (void)willEnterForeground {
     if (self.inBack) {
-//        ArtLogInfo(@"视频录制～～～～进入前台");
         self.needContinue = YES;
         self.inBack = NO;
-        [self startRecord];
-    }
-}
-
-- (void)stopRecordComplete:(void (^)(BOOL, NSString * _Nonnull))complete {
-//    ArtLogInfo(@"视频录制～～～～～结束开始");
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(stopRPScreen) object:nil];
-    self.isRecording = NO;
-    self.needContinue = NO;
-    [self stopRPScreen];
-}
-
-- (void)stopRPScreen {
-    if (@available(iOS 11.0, *)) {
-//        ArtLogInfo(@"视频录制～～～～～stopCapture1");
-        self.isRecording = NO;
-        if ([RPScreenRecorder sharedRecorder].recording) {
-//            ArtLogInfo(@"视频录制～～～～～stopCapture-YES");
-            [[RPScreenRecorder sharedRecorder] stopCaptureWithHandler:^(NSError * _Nullable error) {
-              
-            }];
-        }
-        [self.writeServer stopWrite];
-    } else {
-//        ArtLogInfo(@"视频录制～～～～～失败系统版本低");
+        [self _startRecording];
     }
 }
 
 - (YDVideoWriteServer *)writeServer {
     if (!_writeServer) {
-        __weak typeof(self) weakSelf = self;
+        kWeakSelf(self)
         _writeServer = [[YDVideoWriteServer alloc] initWithFinishCompletion:^(NSString * _Nonnull path) {
-            __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (strongSelf.needContinue) {
-                [strongSelf startRecord];
+            kStrongSelf(self)
+            if (strongself.needContinue) {
+                [strongself _startRecording];
             }
-            if (strongSelf.VideoSction) {
+            if (strongself.VideoSction) {
                 AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:path]];
                 if (asset && asset.duration.value>0) {
-                    strongSelf.VideoSction([path componentsSeparatedByString:@"/"].lastObject, asset.duration.value/asset.duration.timescale, strongSelf.startTime, path);
+                    strongself.VideoSction([path componentsSeparatedByString:@"/"].lastObject, asset.duration.value/asset.duration.timescale, strongself.startTime, path);
 
                 }
             }
@@ -158,5 +175,6 @@
     }
     return _writeServer;
 }
+
 
 @end

@@ -19,7 +19,7 @@ typedef NS_ENUM(NSInteger, RecState) {
     RecState_Stop = 1
     
 };
-@protocol ScreenRecordDelegate <NSObject>
+@protocol YDScreenRecordDelegate <NSObject>
 
 @optional
 
@@ -59,7 +59,7 @@ typedef void(^srerrorinfo)(YDSRErrorHandle *error);
 
 + (instancetype)shareManager;
 
-@property(nonatomic,weak)id<ScreenRecordDelegate>  screenRecordDelegate;
+@property(nonatomic,weak)id<YDScreenRecordDelegate>  screenRecordDelegate;
 
 /**
  是否正在录制中

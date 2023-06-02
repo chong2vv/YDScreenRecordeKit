@@ -7,21 +7,32 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "YDSRErrorHandle.h"
+#import "YDSRErrorInfo.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+// 录屏状态
+typedef NS_ENUM(NSInteger, RecState) {
+    
+    RecState_Rec = 0,
+    RecState_Stop = 1
+    
+};
+
+typedef void(^YDRecordFailure)(YDSRErrorHandle *error);
+typedef void(^YDRecordStartSuccess)(void);
+typedef void(^YDRecordStopSuccess)(NSString *path);
+
 @interface YDScreenRecordServer : NSObject
 
-@property (nonatomic, assign) NSInteger                        teacherId;
-@property (nonatomic, assign) NSInteger                        studentId;
 @property (nonatomic, copy) void (^starSuc)(void);
 @property (nonatomic, copy) void (^saveSuc)(NSString *path);
-
 @property (nonatomic, copy) void(^VideoSction)(NSString *name,NSInteger duration,NSInteger beginTime, NSString *path);
 
-- (void)startScreenRecord;
+- (void)startScreenRecord:(YDRecordStartSuccess) onSuccess failure:(YDRecordFailure) failure;
 
-- (void)stopRecordComplete:(void(^)(BOOL success ,NSString *path))complete;
+- (void)stopRecordComplete:(YDRecordStopSuccess) onSuccess failure:(YDRecordFailure) failure;
 
 @end
 

@@ -42,7 +42,6 @@
 		15F6225E2A2996B600D11F2A /* YDSRErrorHandle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YDSRErrorHandle.h; sourceTree = "<group>"; };
 		15F6225F2A2996B600D11F2A /* YDScreenRecordManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YDScreenRecordManager.h; sourceTree = "<group>"; };
 		15F622602A2996B600D11F2A /* YDVideoWriteServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YDVideoWriteServer.h; sourceTree = "<group>"; };
-		15F622612A2996B600D11F2A /* .gitkeep */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitkeep; sourceTree = "<group>"; };
 		15F622622A2996B600D11F2A /* RPPreviewViewController+MovieURL.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "RPPreviewViewController+MovieURL.m"; sourceTree = "<group>"; };
 		15F622632A2996B600D11F2A /* YDScreenRecordServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YDScreenRecordServer.h; sourceTree = "<group>"; };
 		15F622642A2996B600D11F2A /* YDSRErrorHandle.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YDSRErrorHandle.m; sourceTree = "<group>"; };
@@ -51,6 +50,8 @@
 		15F622672A2996B600D11F2A /* YDScreenRecordManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YDScreenRecordManager.m; sourceTree = "<group>"; };
 		15F622682A2996B600D11F2A /* YDScreenRecordServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YDScreenRecordServer.m; sourceTree = "<group>"; };
 		15F622692A2996B600D11F2A /* RPPreviewViewController+MovieURL.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RPPreviewViewController+MovieURL.h"; sourceTree = "<group>"; };
+		15F6226A2A29BDEF00D11F2A /* YDRecordeManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YDRecordeManager.h; sourceTree = "<group>"; };
+		15F6226B2A29BDEF00D11F2A /* YDRecordeManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YDRecordeManager.m; sourceTree = "<group>"; };
 		4E9F37CE8BB443B1C72AC7FE /* Pods-YDScreenRecordeKit_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YDScreenRecordeKit_Example.release.xcconfig"; path = "Target Support Files/Pods-YDScreenRecordeKit_Example/Pods-YDScreenRecordeKit_Example.release.xcconfig"; sourceTree = "<group>"; };
 		57B8448C0FF353E85D961125 /* Pods-YDScreenRecordeKit_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-YDScreenRecordeKit_Example.debug.xcconfig"; path = "Target Support Files/Pods-YDScreenRecordeKit_Example/Pods-YDScreenRecordeKit_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* YDScreenRecordeKit_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YDScreenRecordeKit_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -124,7 +125,6 @@
 				15F6225E2A2996B600D11F2A /* YDSRErrorHandle.h */,
 				15F6225F2A2996B600D11F2A /* YDScreenRecordManager.h */,
 				15F622602A2996B600D11F2A /* YDVideoWriteServer.h */,
-				15F622612A2996B600D11F2A /* .gitkeep */,
 				15F622622A2996B600D11F2A /* RPPreviewViewController+MovieURL.m */,
 				15F622632A2996B600D11F2A /* YDScreenRecordServer.h */,
 				15F622642A2996B600D11F2A /* YDSRErrorHandle.m */,
@@ -133,6 +133,8 @@
 				15F622672A2996B600D11F2A /* YDScreenRecordManager.m */,
 				15F622682A2996B600D11F2A /* YDScreenRecordServer.m */,
 				15F622692A2996B600D11F2A /* RPPreviewViewController+MovieURL.h */,
+				15F6226A2A29BDEF00D11F2A /* YDRecordeManager.h */,
+				15F6226B2A29BDEF00D11F2A /* YDRecordeManager.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
