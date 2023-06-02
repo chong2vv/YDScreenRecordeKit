@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+target 'YDScreenRecordeKit_Example' do
+  pod 'YDScreenRecordeKit', :path => '../'
+
+  target 'YDScreenRecordeKit_Tests' do
+    inherit! :search_paths
+
+    pod 'FBSnapshotTestCase'
+  end
+end
