@@ -132,23 +132,22 @@ typedef enum : NSUInteger {
         __weak typeof(self) weakSelf = self;
         [_videoWriter finishWritingWithCompletionHandler:^{
             dispatch_async(dispatch_get_main_queue(), ^{
-//                ArtLogInfo(@"视频录制～～～～～结束");
                 __strong typeof(weakSelf) strongSelf = weakSelf;
-                _videoWriter = nil;
-                _videoWriterInput = nil;
-                _avAdaptor = nil;
-                _audioWriterInput = nil;
-                _audioMicWriterInput = nil;
-                _startDate = nil;
-                _lastElapsed = 0;
-                _isWrite = NO;
-                if (strongSelf.FinishCompletion && !_videoWriter.error) {
-                    strongSelf.FinishCompletion(_filePath);
+                self->_videoWriter = nil;
+                self->_videoWriterInput = nil;
+                self->_avAdaptor = nil;
+                self->_audioWriterInput = nil;
+                self->_audioMicWriterInput = nil;
+                self->_startDate = nil;
+                self->_lastElapsed = 0;
+                self->_isWrite = NO;
+                if (strongSelf.FinishCompletion && !self->_videoWriter.error) {
+                    strongSelf.FinishCompletion(self->_filePath);
                 }
             });
         }];
     } @catch (NSException *exception) {
-//        ArtLogInfo(@"视频录制～～～～合成异常:%@",exception);
+        
     } @finally {
         
     }
